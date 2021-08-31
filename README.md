@@ -1,3 +1,5 @@
+# Big refactor incoming, I'll push from another private repo soon™
+
 # C++ string lib in C
 ## Introduction
 ### why?
