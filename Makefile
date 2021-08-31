@@ -1,11 +1,15 @@
 string:
-	- gcc -g -Wall -std=c11 main.c string.h test.h
+	- gcc -march=native -O3 -std=c11 main.c string.c string.h -o beta
 
 test:
-	- ./a.out
+	- gcc -Wall -Wextra -ggdb3 -march=native -fsanitize=address -fno-omit-frame-pointer -std=c11 main.c string.c string.h -o beta
+	- ./beta
+	- gcc -Wall -Wextra -ggdb3 -march=native -fsanitize=leak -fno-omit-frame-pointer -std=c11 main.c string.c string.h -o beta
+	- ./beta
 
 clean:
-	- rm ./a.out
+	- rm ./beta
+
 
 
 

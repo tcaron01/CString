@@ -1,15 +1,46 @@
 #include <stdlib.h>
 #include <stdio.h>
+#include <string.h>
+#include <stdint.h>
 
 #include "string.h"
+#pragma GCC diagnostic ignored "-Wunused-parameter"
 
-char *at(const String *s, const size_t pos){
+String *create(const char *s) {
     if(s == NULL){
-        fprintf(stderr, "at : Can't access NULL string.\n");
+        fprintf(stderr, "create : String is NULL.\n");
         exit(EXIT_FAILURE);
     }
-    if(pos < 0){
-        fprintf(stderr, "at : OOB access, index must be > 0.\n");
+    size_t size = strlen(s);
+    if(size < 1) {
+        fprintf(stderr, "create : size can't be 0 or negative.\n");
+        exit(EXIT_FAILURE);
+    }
+    String *tmp = malloc(sizeof(String));
+    if(tmp == NULL){
+        fprintf(stderr, "create : Allocation failure. Can't allocate String object\n");
+        exit(EXIT_FAILURE);
+    }
+    tmp->str = calloc(size + 1, sizeof(char));
+    if(tmp->str == NULL){
+        fprintf(stderr, "create: Allocation failure. Can't allocate char * in String object\n");
+        exit(EXIT_FAILURE);
+    }
+    tmp->length = size;
+    tmp->capacity = size;
+    strcpy(tmp->str, s);
+    return tmp;
+}
+
+void free_string(String **s){
+    clear(*s);
+    free(*s);
+    *s = NULL;
+}
+
+char at(const String *s, const size_t pos){
+    if(s == NULL){
+        fprintf(stderr, "at : Can't access NULL string.\n");
         exit(EXIT_FAILURE);
     }
     if(pos > s->length){
@@ -23,11 +54,11 @@ char *at(const String *s, const size_t pos){
     return s->str[pos];
 }
 
-char *front(const String *s){
+char front(const String *s){
     return at(s, 0);
 }
 
-char *back(const String *s){
+char back(const String *s){
     return at(s, s->length - 1);
 }
 
@@ -36,16 +67,12 @@ char *data(const String *s){
         fprintf(stderr, "data : Can't access NULL string.\n");
         exit(EXIT_FAILURE);
     }
-    return *(s->str);
+    return s->str;
 }
 
 void insert(String *s, const char c, const size_t pos) {
     if(s == NULL){
         fprintf(stderr, "insert : Can't access NULL string.\n");
-        exit(EXIT_FAILURE);
-    }
-    if(pos < 0){
-        fprintf(stderr, "insert : OOB access, index must be > 0.\n");
         exit(EXIT_FAILURE);
     }
     if(pos > s->length){
@@ -57,12 +84,12 @@ void insert(String *s, const char c, const size_t pos) {
         exit(EXIT_FAILURE);
     }
     String tmp = *s;
-    realloc(s->str, s->length * sizeof(char) + 1);
-    for(int i = 0; i < pos; ++i) {
+    s->str = realloc(s->str, s->length * sizeof(char) + 1);
+    for(uint64_t i = 0; i < pos; ++i) {
         s->str[i] = tmp.str[i];
     }
     s->str[pos] = c;
-    for(int i = pos + 1; i < s->length + 1; ++i) {
+    for(uint64_t i = pos + 1; i < s->length + 1; ++i) {
         s->str[i] = tmp.str[i] - 1;
     }
     s->length++;
@@ -85,7 +112,10 @@ size_t size(const String *s) {
     return s->length;
 }
 
-void shrink_to_fit(String *s);
+void shrink_to_fit(String *s) {
+
+}
+
 void clear(String *s) {
      if(s == NULL){
         fprintf(stderr, "clear : Can't access NULL string.\n");
@@ -97,16 +127,48 @@ void clear(String *s) {
     s->capacity = 0;
 }
 
-void erase(String *s);
-void push_back(String *s);
-void pop_back(String *s);
+void remove_char(String *s, const size_t pos){
+    if(s == NULL){
+        fprintf(stderr, "erase_char : Can't access NULL string.\n");
+        exit(EXIT_FAILURE);
+    }
+    if(pos >= s->length) {
+         fprintf(stderr, "erase_char : Pos bigger than String size.\n");
+        exit(EXIT_FAILURE);
+    }
+    for(uint64_t i = pos; i < s->length; ++i){
+        s->str[pos] = s->str[pos + 1];
+    }
+    s->length--;
+    s->str = realloc(s->str, s->length);
+    if(s->str == NULL) {
+        fprintf(stderr, "erase_char : Can't realloc str buffer.\n");
+        exit(EXIT_FAILURE);
+    }
+}
+
+void remove_substring_by_index(String *s, const size_t b, const size_t e){
+    //TODO
+}
+
+void remove_substring(String *s, const String *pattern){
+    //TODO
+}
+
+void push_back(String *s) {
+    //TODO
+}
+
+void pop_back(String *s){
+    //TODO
+}
+
 void append(String *s, const char c) {
     if(s == NULL){
         fprintf(stderr, "append : Can't access NULL string.\n");
         exit(EXIT_FAILURE);
     }
-    String tmp = *s;
-    realloc(s->str, s->length * sizeof(char) + 1);
+    s->str = realloc(s->str, s->length * sizeof(char) + 1);
     s->str[s->length] = c;
     s->length++;
     s->capacity++;
@@ -126,7 +188,7 @@ int compare(const String *s1, const String *s2) {
     }  else if(s1->length > s2->length){
         return -1;
     }
-    for(int i = 0; i < s1->length; ++i){
+    for(uint64_t i = 0; i < s1->length; ++i){
         if(s1->str[i] < s2->str[i]){
             return 1;
         } else if(s1->str[i] > s2->str[i]){
@@ -148,7 +210,7 @@ bool start_withs(const String *s, const String *p){
     if(p->length > s->length){
         return false;
     }
-    for(int i = 0; i < p->length; ++i){
+    for(uint64_t i = 0; i < p->length; ++i){
         if(s->str[i] != p->str[i]){
             return false;
         }
@@ -168,7 +230,7 @@ bool ends_with(const String *s, const String *p){
     if(p->length > s->length){
         return false;
     }
-    for(int i = s->length - p->length; i < s->length; ++i){
+    for(uint64_t i = s->length - p->length; i < s->length; ++i){
         if(s->str[i] != p->str[i]){
             return false;
         }
@@ -181,7 +243,7 @@ bool contains_char(const String *s, const char p) {
         exit(EXIT_FAILURE);
     }
    
-    for(int i = 0; i < s->length; ++i){
+    for(uint64_t i = 0; i < s->length; ++i){
         if(s->str[i] == p){
             return true;
         }
@@ -189,6 +251,7 @@ bool contains_char(const String *s, const char p) {
     return false;
 }
 bool contains_string(const String *s, const String *p){
+    // TODO
     return true;
 }
 
@@ -198,7 +261,7 @@ void replace_char_first(String *s, const char c, const char r){
         exit(EXIT_FAILURE);
     }
    
-    for(int i = 0; i < s->length; ++i){
+    for(uint64_t i = 0; i < s->length; ++i){
         if(s->str[i] == c){
             s->str[i] = r;
             break;
@@ -211,24 +274,39 @@ void replace_char_all(String *s, const char c, const char r){
         exit(EXIT_FAILURE);
     }
    
-    for(int i = 0; i < s->length; ++i){
+    for(uint64_t i = 0; i < s->length; ++i){
         if(s->str[i] == c){
             s->str[i] = r;
         }
     }
 }
 void replace_substring_first(String *s, const String *m1, const String *m2){
-
+    //TODO
 }
 void replace_substring_all(String *s, const String *m1, const String *m2){
-
+    //TODO
 }
 String *substr(const String *s, const size_t start, const size_t end) {
-    return "a";
+    //TODO
+    return NULL;
 }
 void resize(String *s, const size_t n_size){
-
+    if(s == NULL){
+        fprintf(stderr, "resize: String is NULL.\n");
+        exit(EXIT_FAILURE);
+    }
+    s->str = realloc(s->str, n_size);
+    if(n_size < s->length){
+        for(uint64_t i = n_size; i < s->length; ++i){
+            s->str[i] = 0;
+        }
+    }
+    if(n_size > s->capacity){
+        s->capacity = n_size;
+    }
+    s->length = n_size;
 }
+
 void swap(String *s1, String *s2){
     if(s1 == NULL){
         fprintf(stderr, "swap: First String is NULL.\n");

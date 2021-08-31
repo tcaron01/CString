@@ -9,9 +9,12 @@ typedef struct {
     char* str;
 } String;
 
-char *at(const String *s, const size_t pos);
-char *front(const String *s);
-char *back(const String *s);
+String *create(const char *s);
+void free_string(String **s);
+
+char at(const String *s, const size_t pos);
+char front(const String *s);
+char back(const String *s);
 char *data(const String *s);
 void insert(String *s, const char c, const size_t pos);
 bool empty(const String *s);
@@ -19,7 +22,11 @@ size_t size(const String *s);
 void shrink_to_fit(String *s);
 
 void clear(String *s);
-void erase(String *s);
+
+void remove_char(String *s, const size_t pos);
+void remove_substring_by_index(String *s, const size_t b, const size_t e);
+void remove_substring(String *s, const String *pattern);
+
 void push_back(String *s);
 void pop_back(String *s);
 void append(String *s, const char c);
