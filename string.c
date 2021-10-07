@@ -97,7 +97,7 @@ void insert(String *s, const char c, const size_t pos) {
 }
 
 bool empty(const String *s){
-     if(s == NULL){
+    if(s == NULL){
         fprintf(stderr, "size : Can't access NULL string.\n");
         exit(EXIT_FAILURE);
     }
@@ -113,7 +113,12 @@ size_t size(const String *s) {
 }
 
 void shrink_to_fit(String *s) {
-
+    if(s == NULL){
+        fprintf(stderr, "shrink_to_fit : Can't access NULL string.\n");
+        exit(EXIT_FAILURE);
+    }
+    s->str = realloc(s->str, s->length);
+    s->capacity = s->length;    
 }
 
 void clear(String *s) {
@@ -148,19 +153,51 @@ void remove_char(String *s, const size_t pos){
 }
 
 void remove_substring_by_index(String *s, const size_t b, const size_t e){
-    //TODO
+    if(s->str == NULL) {
+        fprintf(stderr, "remove_substring_by_index : Can't access NULL string.\n");
+        exit(EXIT_FAILURE);
+    }
+    if(b > e){
+        fprintf(stderr, "remove_substring_by_index : first index greater than second index.\n");
+        exit(EXIT_FAILURE);
+    }
+    if(b < 0){
+        fprintf(stderr, "remove_substring_by_index : first index lower than second index.\n");
+        exit(EXIT_FAILURE);
+    }
+    if(e > s->length){
+        fprintf(stderr, "remove_substring_by_index : second index is out-of-bound.\n");
+        exit(EXIT_FAILURE);
+    }
+    
 }
 
 void remove_substring(String *s, const String *pattern){
     //TODO
 }
 
-void push_back(String *s) {
-    //TODO
+void push_back(String *s, const char c) {
+    if(s == NULL){
+        fprintf(stderr, "push_back : Can't access NULL string.\n");
+        exit(EXIT_FAILURE);
+    }
+    if(s->length < s->capacity){
+        s->str[s->length] = c;
+        s->length++;
+    } else if(s->length == s->capacity){
+        s->str = realloc(s->str, s->length + 1);
+        s->capacity++;
+        s->str[s->length] = c;
+        s->length++;
+    }
 }
 
 void pop_back(String *s){
-    //TODO
+    if(s == NULL){
+        fprintf(stderr, "pop_back : Can't access NULL string.\n");
+        exit(EXIT_FAILURE);
+    }
+    s->length--;
 }
 
 void append(String *s, const char c) {

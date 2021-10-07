@@ -27,9 +27,10 @@ void remove_char(String *s, const size_t pos);
 void remove_substring_by_index(String *s, const size_t b, const size_t e);
 void remove_substring(String *s, const String *pattern);
 
-void push_back(String *s);
+void push_back(String *s, const char c);
 void pop_back(String *s);
 void append(String *s, const char c);
+
 int compare(const String *s1, const String *s2);
 bool starts_with(const String *s, const String *p);
 bool ends_with(const String *s, const String *p);
@@ -44,6 +45,5 @@ void replace_substring_all(String *s, const String *m1, const String *m2);
 String *substr(const String *s, const size_t start, const size_t end);
 void resize(String *s, const size_t n_size);
 void swap(String *s1, String *s2);
-
 
 #endif
